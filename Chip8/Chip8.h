@@ -66,6 +66,10 @@ private:
 	void OP_Fx55();
 	void OP_Fx65();
 
+	void FetchOpcode();
+	void DecodeAndExecute();
+
+	void Reset();
 
 public:
 	Chip8();
@@ -73,8 +77,7 @@ public:
 
 	void LoadROM(const std::string& filename);
 	void GetDisplay(uint32_t* buffer) const;
+	void SetKey(uint8_t key, uint8_t value);
 
-	void FetchOpcode();
-	void DecodeAndExecute();
 	void Cycle();
 };

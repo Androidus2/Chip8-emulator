@@ -32,33 +32,7 @@ uint8_t fontset[FONTSET_SIZE] =
 
 Chip8::Chip8() : randGen(std::chrono::system_clock::now().time_since_epoch().count())
 {
-	// Initialize registers and memory once
-	pc = 0x200;
-	opcode = 0;
-	index = 0;
-	sp = 0;
-
-	// Clear display
-	for (int i = 0; i < displayWidth * displayHeight; i++)
-		display[i] = 0;
-
-	// Clear stack, registers, and memory
-	for (int i = 0; i < 16; i++)
-	{
-		stack[i] = 0;
-		registers[i] = 0;
-	}
-
-	for (int i = 0; i < 4096; i++)
-		memory[i] = 0;
-
-	// Load fontset
-	for (int i = 0; i < FONTSET_SIZE; i++)
-		memory[FONTSET_START_ADDRESS + i] = fontset[i];
-
-	// Reset timers
-	delayTimer = 0;
-	soundTimer = 0;
+	Reset();
 
 	randByte = std::uniform_int_distribution<uint16_t>(0, 255U);
 }
@@ -70,6 +44,7 @@ Chip8::~Chip8()
 
 void Chip8::LoadROM(const std::string& filename)
 {
+	Reset();
 	std::ifstream file(filename, std::ios::binary | std::ios::ate);
 
 	if (file.is_open())
@@ -464,4 +439,43 @@ void Chip8::GetDisplay(uint32_t* buffer) const
 {
 	for (int i = 0; i < displayWidth * displayHeight; i++)
 		buffer[i] = display[i] ? 0xFFFFFFFF : 0xFF000000;
+}
+
+void Chip8::SetKey(uint8_t key, uint8_t value)
+{
+	keys[key] = value;
+}
+
+void Chip8::Reset()
+{
+	pc = START_ADDRESS;
+	opcode = 0;
+	index = 0;
+	sp = 0;
+
+	// Clear display
+	for (int i = 0; i < displayWidth * displayHeight; i++)
+		display[i] = 0;
+
+	// Clear stack, registers, and memory
+	for (int i = 0; i < 16; i++)
+	{
+		stack[i] = 0;
+		registers[i] = 0;
+	}
+
+	for (int i = 0; i < 4096; i++)
+		memory[i] = 0;
+
+	// Reset keys
+	for (int i = 0; i < 16; i++)
+		keys[i] = 0;
+
+	// Load fontset
+	for (int i = 0; i < FONTSET_SIZE; i++)
+		memory[FONTSET_START_ADDRESS + i] = fontset[i];
+
+	// Reset timers
+	delayTimer = 0;
+	soundTimer = 0;
 }
