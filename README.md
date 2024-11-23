@@ -3,13 +3,13 @@ A basic Chip8 emulator made for learning more about the way emulators work.
 Currently a WIP.
 
 To do:
-- Add a delay in order to limit simulation speed
-- Get input handling working
-- Load a custom ROM at runtime
+- ~~Add a delay in order to limit simulation speed~~
+- ~~Get input handling working~~
+- ~~Load a custom ROM at runtime~~
 - Change emulator scale
-- Change window size
+- ~~Change window size~~
 - Changing the delay
-- Pausing
+- ~~Pausing~~
 - Playing a single step
 - Potentially saving and loading states
 
