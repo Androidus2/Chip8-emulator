@@ -3,6 +3,7 @@
 #include "Chip8.h"
 #include "Button.h"
 #include "FileSelection.h"
+#include "InputField.h"
 
 void HandleInput(Chip8& chip8, sf::Event& ev) {
 	if (ev.type == sf::Event::KeyPressed) {
@@ -62,7 +63,7 @@ sf::Vector2f mousePositionInUI;
 
 int main()
 {
-	const int scale = 10;
+	float scale = 10;
 	float delay = 1.0f / 100.0f;
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Chip8 Emulator");
@@ -87,16 +88,85 @@ int main()
 
 	Button loadButton(sf::Vector2f(120, 50), sf::Vector2f(5, 5), "Load ROM",
 		[&chip8]() {
-			std::string filename = OpenFileDialog();
+			std::string filename = OpenFileDialog(true);
 			if (filename != "") chip8.LoadROM(filename);
 		});
 
 	bool isPaused = false;
+	bool step = false;
 
 	Button pauseButton(sf::Vector2f(120, 50), sf::Vector2f(135, 5), "Pause / Play",
 		[&isPaused]() {
 			isPaused = !isPaused;
 		});
+
+
+	Button stepButton(sf::Vector2f(50, 50), sf::Vector2f(265, 5), "Step",
+		[&step, &isPaused]() {
+			if(isPaused)
+				step = true;
+		});
+
+
+	InputField scaleField(sf::Vector2f(120, 30), sf::Vector2f(400, 15), "10");
+	scaleField.SetOnFinishEdit([&scale, &chip8Sprite, &window, &scaleField](const std::string& text) {
+		try {
+			std::stof(text);
+		}
+		catch (std::exception e) {
+			scaleField.SetText(std::to_string(scale));
+			return;
+		}
+		scale = std::stof(text);
+		chip8Sprite.setScale(scale, scale);
+		CenterChip8Screen(window, chip8Sprite);
+		});
+
+	sf::Text scaleText;
+	scaleText.setFont(font);
+	scaleText.setCharacterSize(20);
+	scaleText.setFillColor(sf::Color::White);
+	scaleText.setString("Scale:");
+	scaleText.setPosition(365, 25);
+	scaleText.setOrigin(scaleText.getLocalBounds().width / 2, scaleText.getLocalBounds().height / 2);
+
+
+	InputField delayField(sf::Vector2f(120, 30), sf::Vector2f(600, 15), "100");
+	delayField.SetOnFinishEdit([&delay, &window, &delayField](const std::string& text) {
+		try {
+			float val = std::stof(text);
+			if (val <= 0) throw std::exception();
+		}
+		catch (std::exception e) {
+			delayField.SetText(std::to_string(1.0f / delay));
+			return;
+		}
+		delay = 1.0f / std::stof(text);
+		window.setFramerateLimit(1.0f / delay);
+		});
+
+	sf::Text delayText;
+	delayText.setFont(font);
+	delayText.setCharacterSize(20);
+	delayText.setFillColor(sf::Color::White);
+	delayText.setString("Delay:");
+	delayText.setPosition(560, 25);
+	delayText.setOrigin(delayText.getLocalBounds().width / 2, delayText.getLocalBounds().height / 2);
+
+
+
+	Button saveStateButton(sf::Vector2f(120, 50), sf::Vector2f(5, 60), "Save State",
+		[&chip8]() {
+			std::string filename = SaveFileDialog();
+			if (filename != "") chip8.SaveState(filename);
+		});
+
+	Button loadStateButton(sf::Vector2f(120, 50), sf::Vector2f(135, 60), "Load State",
+		[&chip8]() {
+			std::string filename = OpenFileDialog(false);
+			if (filename != "") chip8.LoadState(filename);
+		});
+
 
 	while (window.isOpen())
 	{
@@ -112,14 +182,22 @@ int main()
 				CenterChip8Screen(window, chip8Sprite);
 			}
 
-			if (!isPaused)
+			if (!isPaused || step)
 				HandleInput(chip8, event);
 			loadButton.HandleEvent(event);
 			pauseButton.HandleEvent(event);
+			scaleField.HandleEvent(event);
+			delayField.HandleEvent(event);
+			stepButton.HandleEvent(event);
+			saveStateButton.HandleEvent(event);
+			loadStateButton.HandleEvent(event);
 		}
 
 		loadButton.Update();
 		pauseButton.Update();
+		stepButton.Update();
+		saveStateButton.Update();
+		loadStateButton.Update();
 
 		if (!isPaused) {
 			chip8.Cycle();
@@ -127,11 +205,26 @@ int main()
 
 			chip8Texture.update((sf::Uint8*)display, displayWidth, displayHeight, 0, 0);
 		}
+		else if (step) {
+			std::cout << "Step" << std::endl;
+			chip8.Cycle();
+			chip8.GetDisplay(display);
+
+			chip8Texture.update((sf::Uint8*)display, displayWidth, displayHeight, 0, 0);
+			step = false;
+		}
 
 		window.clear();
 		window.draw(chip8Sprite);
-		loadButton.Draw(window);
+		stepButton.Draw(window);
+		delayField.Draw(window);
+		window.draw(delayText);
+		scaleField.Draw(window);
+		window.draw(scaleText);
 		pauseButton.Draw(window);
+		loadButton.Draw(window);
+		saveStateButton.Draw(window);
+		loadStateButton.Draw(window);
 		window.display();
 	}
 	return 0;

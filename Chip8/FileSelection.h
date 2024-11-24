@@ -6,6 +6,6 @@
 
 #pragma comment(lib, "Comdlg32.lib")
 
-std::string OpenFileDialog();
+std::string OpenFileDialog(bool isROM);
 
 std::string SaveFileDialog();

@@ -1,6 +1,6 @@
 #include "FileSelection.h"
 
-std::string OpenFileDialog() {
+std::string OpenFileDialog(bool isROM) {
 	OPENFILENAMEW ofn;       // Note the 'W' at the end for wide char version
 	WCHAR szFile[260];       // buffer for file name, using wide char
 	HWND hwnd = NULL;        // owner window
@@ -15,7 +15,10 @@ std::string OpenFileDialog() {
 	// use the contents of szFile to initialize itself.
 	ofn.lpstrFile[0] = L'\0';
 	ofn.nMaxFile = sizeof(szFile) / sizeof(WCHAR);
-	ofn.lpstrFilter = L"Chip8 ROMs\0*.CH8\0";
+	if (isROM)
+		ofn.lpstrFilter = L"Chip8 ROMs (.ch8 files)\0*.CH8\0";
+	else
+		ofn.lpstrFilter = L"Chip8 save states (.ch8ss files)\0*.CH8SS\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
@@ -56,7 +59,7 @@ std::string SaveFileDialog() {
 	// use the contents of szFile to initialize itself.
 	ofn.lpstrFile[0] = L'\0';
 	ofn.nMaxFile = sizeof(szFile) / sizeof(WCHAR);
-	ofn.lpstrFilter = L"Chip8 ROMs\0*.CH8\0";
+	ofn.lpstrFilter = L"Chip8 save states (.ch8ss files)\0*.CH8SS\0";
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;

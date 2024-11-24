@@ -136,12 +136,14 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Chip8.cpp" />
     <ClCompile Include="FileSelection.cpp" />
+    <ClCompile Include="InputField.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h" />
     <ClInclude Include="Chip8.h" />
     <ClInclude Include="FileSelection.h" />
+    <ClInclude Include="InputField.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

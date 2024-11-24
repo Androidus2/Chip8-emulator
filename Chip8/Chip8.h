@@ -80,4 +80,7 @@ public:
 	void SetKey(uint8_t key, uint8_t value);
 
 	void Cycle();
+
+	void SaveState(const std::string& filename) const;
+	void LoadState(const std::string& filename);
 };

@@ -479,3 +479,57 @@ void Chip8::Reset()
 	delayTimer = 0;
 	soundTimer = 0;
 }
+
+void Chip8::SaveState(const std::string& filename) const
+{
+	std::ofstream file(filename, std::ios::binary);
+
+	if (file.is_open())
+	{
+		// Write memory
+		file.write(reinterpret_cast<const char*>(memory), sizeof(memory));
+		// Write registers
+		file.write(reinterpret_cast<const char*>(registers), sizeof(registers));
+		// Write index, pc, sp, opcode
+		file.write(reinterpret_cast<const char*>(&index), sizeof(index));
+		file.write(reinterpret_cast<const char*>(&pc), sizeof(pc));
+		file.write(reinterpret_cast<const char*>(&sp), sizeof(sp));
+		file.write(reinterpret_cast<const char*>(&opcode), sizeof(opcode));
+		// Write stack
+		file.write(reinterpret_cast<const char*>(stack), sizeof(stack));
+		// Write timers
+		file.write(reinterpret_cast<const char*>(&delayTimer), sizeof(delayTimer));
+		file.write(reinterpret_cast<const char*>(&soundTimer), sizeof(soundTimer));
+		// Write display
+		file.write(reinterpret_cast<const char*>(display), sizeof(display));
+		// Write keys
+		file.write(reinterpret_cast<const char*>(keys), sizeof(keys));
+	}
+}
+
+void Chip8::LoadState(const std::string& filename)
+{
+	std::ifstream file(filename, std::ios::binary);
+
+	if (file.is_open())
+	{
+		// Read memory
+		file.read(reinterpret_cast<char*>(memory), sizeof(memory));
+		// Read registers
+		file.read(reinterpret_cast<char*>(registers), sizeof(registers));
+		// Read index, pc, sp, opcode
+		file.read(reinterpret_cast<char*>(&index), sizeof(index));
+		file.read(reinterpret_cast<char*>(&pc), sizeof(pc));
+		file.read(reinterpret_cast<char*>(&sp), sizeof(sp));
+		file.read(reinterpret_cast<char*>(&opcode), sizeof(opcode));
+		// Read stack
+		file.read(reinterpret_cast<char*>(stack), sizeof(stack));
+		// Read timers
+		file.read(reinterpret_cast<char*>(&delayTimer), sizeof(delayTimer));
+		file.read(reinterpret_cast<char*>(&soundTimer), sizeof(soundTimer));
+		// Read display
+		file.read(reinterpret_cast<char*>(display), sizeof(display));
+		// Read keys
+		file.read(reinterpret_cast<char*>(keys), sizeof(keys));
+	}
+}
